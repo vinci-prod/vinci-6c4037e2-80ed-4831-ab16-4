@@ -403,6 +403,53 @@ function confettiComplete(event, emoji, completeMessage) {
     }
 }
 
+async function checkUserInputComplete(event) {
+    event.preventDefault();
+    var allElements = document.querySelectorAll('*[id]');
+    var allIds = {};
+    for (var i = 0, n = allElements.length; i < n; ++i) {
+        var el = allElements[i];
+        if (!ignore.includes(el.id)) {
+            if (el.id) {
+                allIds[el.id.toString()] = el.value;
+            }
+        }
+    }
+
+    if (window.localStorage.getItem('user') !== null && new Date().getTime() < (JSON.parse(window.localStorage.getItem('user')).expiry)) {
+        let userData = JSON.parse(window.localStorage.getItem('user'));
+        let merged = { ...userData, ...allIds };
+        window.localStorage.setItem('user', JSON.stringify(merged));
+        let userDataF = JSON.parse(window.localStorage.getItem('user'));
+        var pathArray = window.location.pathname.split('/');
+        axios.post(BASE_URL + '/updateuseronboarding', {
+            projectId: pathArray[1],
+            requestURL: window.location.href,
+            userData: userDataF,
+            API_KEY: 'VINCI_DEV_6E577'
+        });
+    } else {
+        const countryR = await country();
+        allIds.country = countryR.country;
+        allIds.id = 'onboarding-user-' + crypto.randomUUID();
+        allIds.expiry = new Date().getTime() + 600000;
+        window.localStorage.setItem('user', JSON.stringify(allIds));
+        let userData = JSON.parse(window.localStorage.getItem('user'));
+        var pathArray = window.location.pathname.split('/');
+        axios.post(BASE_URL + '/adduseronboarding', {
+            projectId: pathArray[1],
+            requestURL: window.location.href,
+            userData: userData,
+            API_KEY: 'VINCI_DEV_6E577'
+        });
+    }
+
+    const data = document.querySelector("#inputNext");
+    if (data.dataset.href.includes("Complete")) {
+        window.close();
+    }
+}
+
 
 logPageView();
 init();
