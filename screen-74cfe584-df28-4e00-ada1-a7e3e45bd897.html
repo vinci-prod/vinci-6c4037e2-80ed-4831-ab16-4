@@ -48,8 +48,8 @@
             }
             const completeMessage = "Thank you for completing the onboarding! You can now close this page.";
             document.querySelector("#completeC").addEventListener("click", function(e){
-                confettiComplete(event, emoji, completeMessage)
                 e.preventDefault();
+                confettiComplete(event, emoji, completeMessage)
                 return false;
             });
         }
